@@ -8,7 +8,10 @@
           <th>Start</th>
           <th>Signed</th>
           <th>Region</th>
-          <th>Current Rent</th>
+          <th>Current Rent (Eur)</th>
+          <th>Base Index</th>
+          <th>Current Index</th>
+          <th>NEW RENT!</th>
         </tr>
       </thead>
       <tbody>
@@ -17,6 +20,9 @@
           <td>{{ input.signed }}</td>
           <td>{{ input.region }}</td>
           <td>{{ input.rent }}</td>
+          <td>{{ input.base_index }}</td>
+          <td>{{ input.current_index }}</td>
+          <td>{{ input.new_rent }}</td>
         </tr>
       </tbody>
     </table>

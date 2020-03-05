@@ -2,7 +2,7 @@
   <div id="app">
     <img alt="Vue logo" src="./assets/logo.png">
     <!-- <HelloWorld msg="Welcome to Your Vue.js App"/> -->
-    <indexation-form @add:input="addInput" />
+    <indexation-form @add:input="sendInputs" />
     <form-inputs-table v-bind:inputs="inputs" />
   </div>
 </template>
@@ -24,10 +24,13 @@ export default {
       inputs: [
         {
           id: 1,
-          start: "21/01/2010",
-          signed: "25/02/2018",
+          start: "01/09/2010",
+          signed: "25/07/2010",
           region: "brussels",
           rent: 500,
+          base_index: 1112.74,
+          current_index: 131.72,
+          new_rent: 584.18
         },
       ],
     }
@@ -42,8 +45,28 @@ export default {
       const newInput = { ...input, id };
 
       this.inputs = [...this.inputs, newInput];
-    }
+  },
+  async sendInputs(input) {
+    try {
+      console.log(JSON.stringify(input))
+      const response = await fetch('http://localhost:4567/v1/indexations', {
+        method: 'POST',
+        body: JSON.stringify(input),
+        headers: {
+          'Content-type': 'application/json; charset=UTF-8' },
+      })
+      const data = await response.json()
+      // at this point, data is the response from sinatra
+      console.log(data)
+      this.inputs = [...this.inputs, data]
+    } catch (error) {
+      console.error(error)
   }
+}
+}
+  // mounted() {
+  //   this.getInputs()
+  // }
 }
 </script>
 

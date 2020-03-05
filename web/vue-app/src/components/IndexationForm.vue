@@ -80,7 +80,7 @@
           start: '',
           signed: '',
           rent: '',
-          region: ''
+          region: '',
         },
       }
     },
