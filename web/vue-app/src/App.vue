@@ -45,6 +45,7 @@ export default {
       const newInput = { ...input, id };
 
       this.inputs = [...this.inputs, newInput];
+      console.log(this.inputs)
   },
   async sendInputs(input) {
     try {
@@ -59,6 +60,7 @@ export default {
       // at this point, data is the response from sinatra
       console.log(data)
       this.inputs = [...this.inputs, data]
+      console.log(this.inputs)
     } catch (error) {
       console.error(error)
   }

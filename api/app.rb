@@ -1,6 +1,5 @@
 require 'sinatra'
 require "sinatra/cross_origin"
-require 'open-uri'
 require 'byebug'
 require 'date'
 require 'rest-client'
@@ -18,7 +17,7 @@ end
 post '/v1/indexations' do
   data = JSON.parse request.body.read
   print data
-  p signed_on = Date.parse(data["signed"])
+  signed_on = Date.parse(data["signed"])
   sign_month = signed_on.mon
 
   if signed_on.mon == 1
@@ -50,12 +49,14 @@ post '/v1/indexations' do
   end
   puts "Current Month : #{current_month}"
 
-  bases = [2013, 2004, 1996, 1988]
+  bases = [1988, 1996, 2004, 2013]
 
-  year_selected = bases.map do |year|
-    year if year <= signed_on.year
-  end.max
-
+  year_selected = nil
+  bases.map do |year|
+    if year <= Date.parse(data["signed"]).year
+      year_selected = year
+    end
+  end
   p "#{year_selected}"
 
   rent = data["rent"]
@@ -68,35 +69,48 @@ post '/v1/indexations' do
     current_month: current_month
   }
 
-  p params[:base_month]
-
+  indexes = {}
   begin
     # url = "https://fi7661d6o4.execute-api.eu-central-1.amazonaws.com/prod/indexes/#{params[:base_year]}/#{params[:current_month]}/"
     # print url
-    print "https://fi7661d6o4.execute-api.eu-central-1.amazonaws.com/prod/indexes/#{params[:base_year]}/#{params[:base_month]}"
-    response = RestClient.get "https://fi7661d6o4.monthexecute-api.eu-central-1.amazonaws.com/prod/indexes/#{params[:base_year]}/#{params[:base_month]}"
+    url = "https://fi7661d6o4.execute-api.eu-central-1.amazonaws.com/prod/indexes/#{params[:base_year]}/#{params[:base_month]}"
+    response = RestClient.get url
     print intermediary_response = JSON.parse(response)
     # puts pretty_response = JSON.pretty_generate(intermediary_response)
-    puts "#"*10
+    puts "#" * 10
     print intermediary_response.keys
-    base_index = intermediary_response['index']["MS_HLTH_IDX"]
-    puts "#"*10
-    print base_index
+    base_index = intermediary_response["index"]["MS_HLTH_IDX"]
+    puts "#" * 10
+    indexes[:base] = base_index
   rescue RestClient::ExceptionWithResponse => e
     p e.response
   end
 
-  # begin
-  #   url = "https://fi7661d6o4.execute-api.eu-central-1.amazonaws.com/prod/indexes/#{params["base_year"]}/#{params["current_month"]}"
-  #   puts url
-  #   response_two = RestClient.get(url)
-  #   intermediary_response_two = JSON.parse(response_two)
-  #   current_index = intermediary_response_two["index"]["MS_HLTH_IDX"]
-  #   # puts JSON.pretty_generate response
-  #   p current_index
-  # rescue RestClient::ExceptionWithResponse => e
-  #   p e.response
-  # end
+  begin
+    # url = "https://fi7661d6o4.execute-api.eu-central-1.amazonaws.com/prod/indexes/#{params[:base_year]}/#{params[:current_month]}/"
+    # print url
+    url_two = "https://fi7661d6o4.execute-api.eu-central-1.amazonaws.com/prod/indexes/#{params[:base_year]}/#{params[:current_month]}"
+    response_two = RestClient.get url_two
+    print intermediary_response_two = JSON.parse(response_two)
+    # puts pretty_response_two = JSON.pretty_generate(intermediary_response_two)
+    puts "#" * 10
+    print intermediary_response_two.keys
+    current_index = intermediary_response_two["index"]["MS_HLTH_IDX"]
+    puts "#" * 10
+    indexes[:current] = current_index
+  rescue RestClient::ExceptionWithResponse => e
+    p e.response
+  end
+
+  # Computing the rent
+
+  new_rent = (params[:rent].to_i * indexes[:current].to_f) / indexes[:base].to_f
+  puts "RENT : #{new_rent} "
+  {
+    new_rent: new_rent,
+    base_index: indexes[:base],
+    current_index: indexes[:current]
+  }.to_json
 end
 
 options '*' do
