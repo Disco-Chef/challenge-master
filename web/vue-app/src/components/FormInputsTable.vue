@@ -1,3 +1,4 @@
+<!-- Once api calls and calculations are done, add new indexed rent for user to see past -->
 <template>
   <div id="form-inputs-table">
     <h1>Your previous inputs</h1>
