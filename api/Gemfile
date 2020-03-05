@@ -1,8 +1,9 @@
 source 'https://rubygems.org'
 ruby '2.6.3'
 
+gem 'byebug'
 gem 'sinatra'
-gem "sinatra-cross_origin", "~> 0.3.1"
+gem 'sinatra-cross_origin', '~> 0.3.1'
 gem 'thin'
 
 group :development do
