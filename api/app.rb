@@ -12,24 +12,43 @@ before do
   response.headers['Access-Control-Allow-Origin'] = '*'
 end
 
-# ROUTES ...
+def endpoint_call(base, month)
+  begin
+    # url = "https://fi7661d6o4.execute-api.eu-central-1.amazonaws.com/prod/indexes/#{params[:base_year]}/#{params[:current_month]}/"
+    # print url
+    url = "https://fi7661d6o4.execute-api.eu-central-1.amazonaws.com/prod/indexes/#{base}/#{month}"
+    response = RestClient.get url
+    print intermediary_response = JSON.parse(response)
+    # puts pretty_response = JSON.pretty_generate(intermediary_response)
+    puts "#" * 10
+    print intermediary_response.keys
+    base_index = intermediary_response["index"]["MS_HLTH_IDX"]
+    puts "#" * 10
+    return base_index
+  rescue RestClient::ExceptionWithResponse => e
+    p e.response
+  end
+end
 
+def removing_month(date_object)
+  date_year = date_object.year
+  date_mon = date_object.mon
+  date_day = date_object.day
+  if date_mon == 1
+    date_mon = 12
+    date_year -= 1
+  else
+    date_mon -= 1
+  end
+  Date.new(date_year, date_mon, date_day)
+end
+
+# ROUTES ...
 post '/v1/indexations' do
   data = JSON.parse request.body.read
   print data
   signed_on = Date.parse(data["signed"])
-  sign_month = signed_on.mon
-
-  if signed_on.mon == 1
-    sign_month = 12
-    sign_year = signed_on.year - 1
-  else
-    sign_month = signed_on.mon - 1
-    sign_year = signed_on.year
-  end
-
-  sign_day = signed_on.day
-  signed_on = Date.new(sign_year, sign_month, sign_day)
+  signed_on = removing_month(signed_on)
   base_month = signed_on.strftime("%Y-%m")
   puts "Base Month : #{base_month}"
 
@@ -37,15 +56,19 @@ post '/v1/indexations' do
   start_month = start_on.mon
   start_day = start_on.day
 
-  test_year = Date.today.year
-  test_birthday = Date.new(test_year, start_month, start_day)
+  present_year = Date.today.year
+  recent_birthday = Date.new(present_year, start_month, start_day)
   today = Date.today
 
-  if today > test_birthday
-    current_month = test_birthday.strftime("%Y-%m")
+  if today > recent_birthday
+
+    recent_birthday = removing_month(recent_birthday)
+    current_month = recent_birthday.strftime("%Y-%m")
   else
-    test_year = Date.today.year - 1
-    current_month = Date.new(test_year, start_month, start_day).strftime("%Y-%m")
+    recent_month = recent_birthday.month - 1
+    recent_day = recent_birthday.day
+    recent_year = Date.today.year - 1
+    current_month = Date.new(recent_year, recent_month, recent_day).strftime("%Y-%m")
   end
   puts "Current Month : #{current_month}"
 
@@ -70,44 +93,17 @@ post '/v1/indexations' do
   }
 
   indexes = {}
-  begin
-    # url = "https://fi7661d6o4.execute-api.eu-central-1.amazonaws.com/prod/indexes/#{params[:base_year]}/#{params[:current_month]}/"
-    # print url
-    url = "https://fi7661d6o4.execute-api.eu-central-1.amazonaws.com/prod/indexes/#{params[:base_year]}/#{params[:base_month]}"
-    response = RestClient.get url
-    print intermediary_response = JSON.parse(response)
-    # puts pretty_response = JSON.pretty_generate(intermediary_response)
-    puts "#" * 10
-    print intermediary_response.keys
-    base_index = intermediary_response["index"]["MS_HLTH_IDX"]
-    puts "#" * 10
-    indexes[:base] = base_index
-  rescue RestClient::ExceptionWithResponse => e
-    p e.response
-  end
 
-  begin
-    # url = "https://fi7661d6o4.execute-api.eu-central-1.amazonaws.com/prod/indexes/#{params[:base_year]}/#{params[:current_month]}/"
-    # print url
-    url_two = "https://fi7661d6o4.execute-api.eu-central-1.amazonaws.com/prod/indexes/#{params[:base_year]}/#{params[:current_month]}"
-    response_two = RestClient.get url_two
-    print intermediary_response_two = JSON.parse(response_two)
-    # puts pretty_response_two = JSON.pretty_generate(intermediary_response_two)
-    puts "#" * 10
-    print intermediary_response_two.keys
-    current_index = intermediary_response_two["index"]["MS_HLTH_IDX"]
-    puts "#" * 10
-    indexes[:current] = current_index
-  rescue RestClient::ExceptionWithResponse => e
-    p e.response
-  end
+
+  indexes[:current] = endpoint_call(params[:base_year], params[:current_month])
+  indexes[:base] = endpoint_call(params[:base_year], params[:base_month])
 
   # Computing the rent
 
   new_rent = (params[:rent].to_i * indexes[:current].to_f) / indexes[:base].to_f
   puts "RENT : #{new_rent} "
   {
-    new_rent: new_rent,
+    new_rent: new_rent.round(2),
     base_index: indexes[:base],
     current_index: indexes[:current]
   }.to_json

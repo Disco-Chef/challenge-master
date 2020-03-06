@@ -1,3 +1,5 @@
+Yo, Alexis, you can run `npm run dev` to launch both servers (it presumes you have zsh terminal and ruby installed on it. Otherwise, you can change the script in the root package.json (but whatever you change it to, it presumes you have ruby installed on that terminal))
+
 # Smovin welcome challenge
 
 ## Context

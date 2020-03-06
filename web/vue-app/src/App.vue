@@ -2,8 +2,9 @@
   <div id="app">
     <img alt="Vue logo" src="./assets/logo.png">
     <!-- <HelloWorld msg="Welcome to Your Vue.js App"/> -->
-    <indexation-form @add:input="sendInputs" />
-    <form-inputs-table v-bind:inputs="inputs" />
+
+    <form-inputs-table v-if="dataReceived" v-bind:inputs="inputs" />
+    <indexation-form   v-else @add:input="sendInputs" />
   </div>
 </template>
 
@@ -33,6 +34,7 @@ export default {
           new_rent: 584.18
         },
       ],
+      dataReceived: false
     }
   },
   methods: {
@@ -45,11 +47,9 @@ export default {
       const newInput = { ...input, id };
 
       this.inputs = [...this.inputs, newInput];
-      console.log(this.inputs)
   },
   async sendInputs(input) {
     try {
-      console.log(JSON.stringify(input))
       const response = await fetch('http://localhost:4567/v1/indexations', {
         method: 'POST',
         body: JSON.stringify(input),
@@ -58,14 +58,21 @@ export default {
       })
       const data = await response.json()
       // at this point, data is the response from sinatra
-      console.log(data)
-      this.inputs = [...this.inputs, data]
-      console.log(this.inputs)
-    } catch (error) {
-      console.error(error)
+      let newLine = {
+          rent: input.rent,
+          new_rent: data.new_rent,
+          base_index: data.base_index,
+          current_index: data.current_index
+      }
+      this.addInput(newLine)
+
+      this.inputs = [newLine]
+      this.dataReceived = true
+      } catch (error) {
+        console.error(error)
+      }
+    }
   }
-}
-}
   // mounted() {
   //   this.getInputs()
   // }
@@ -75,7 +82,7 @@ export default {
 <style>
   body {
     margin: 0 auto;
-    width: 500px;
+    width: 700px;
   }
   #app {
     font-family: Avenir, Helvetica, Arial, sans-serif;

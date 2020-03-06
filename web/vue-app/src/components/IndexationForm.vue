@@ -8,7 +8,7 @@
             ref="first"
             type="text"
             v-model="input.start"
-            :class="{ 'has-error': submitting && invalidStart }"
+            :class="{ 'has-error': (submitting && (emptyStart ||conceptError)) }"
             @focus="clearStatus"
             @keypress="clearStatus"
           />
@@ -18,7 +18,7 @@
           <input
             type="text"
             v-model="input.signed"
-            :class="{ 'has-error': submitting && invalidSigned }"
+            :class="{ 'has-error': (submitting && (emptySigned || farseerError || conceptError))}"
             @focus="clearStatus"
           />
         </div>
@@ -29,7 +29,7 @@
           <input
             type="text"
             v-model="input.rent"
-            :class="{ 'has-error': submitting && invalidRent }"
+            :class="{ 'has-error': (submitting && (emptyRent || InvalidRent)) }"
             @focus="clearStatus"
           />
         </div>
@@ -38,7 +38,7 @@
           <input
             type="text"
             v-model="input.region"
-            :class="{ 'has-error': submitting && invalidRegion }"
+            :class="{ 'has-error': (submitting && (emptyRegion ||invalidLocation)) }"
             @focus="clearStatus"
           />
         </div>
@@ -46,9 +46,13 @@
 
 
       <br>
-      <p v-if="error && submitting" class="error-message">
-        ❗Please fill out all required fields
+      <p v-if="lackOfInputError && submitting" class="error-message">
+        ❗There seems to be some missing fields 😞
       </p>
+      <p v-if="this.farseerError && submitting" class="error-message">❗One of your your signed date is in the future</p>
+      <p v-if="this.conceptError && submitting" class="error-message">❗Sign date cannot be in the future of the start date 😏 </p>
+      <p v-if="this.invalidRent && submitting" class="error-message">❗Please input a numerical value for the rent 🔎 </p>
+      <p v-if="this.invalidLocation && submitting" class="error-message">❗Region selection can only be one of three: brussels, flanders, wallonia </p>
       <p v-if="success" class="success-message">
         ✅ Indexed rent successfully added
       </p>
@@ -74,8 +78,12 @@
     data() {
       return {
         submitting: false,
-        error: false,
+        lackOfInputError: false,
         success: false,
+        conceptualError: false,
+        oracleError: false,
+        numbersError: false,
+        regionError: false,
         input: {
           start: '',
           signed: '',
@@ -90,8 +98,24 @@
         this.submitting = true
         this.clearStatus()
 
-        if (this.invalidRent || this.invalidRegion || this.invalidStart || this.invalidSigned) {
-          this.error = true
+        if (this.emptyRent || this.emptyRegion || this.emptyStart || this.emptySigned) {
+          this.lackOfInputError = true
+          return
+        }
+        if (this.farseerError) {
+          this.oracleError = true
+          return
+        }
+        if (this.conceptError) {
+          this.conceptualError = true
+          return
+        }
+        if (this.invalidRent) {
+          this.numbersError = true
+          return
+        }
+        if (this.invalidLocation) {
+          this.regionError = true
           return
         }
 
@@ -103,7 +127,7 @@
           rent: '',
           region: ''
         }
-        this.error = false
+        this.lackOfInputError = false
         this.success = true
         this.submitting = false
 
@@ -111,23 +135,34 @@
 
       clearStatus() {
         this.success = false
-        this.error = false
+        this.lackOfInputError = false
       }
     },
     computed: {
-      // Add more validation later (rent must be positive number, start and signed cant be in the future, region must be one of the tree options)
-      invalidStart() {
+      emptyStart() {
         return this.input.start === ''
       },
-      invalidSigned() {
+      emptySigned() {
         return this.input.signed === ''
       },
-      invalidRent() {
+      emptyRent() {
         return this.input.rent === ''
       },
-      invalidRegion() {
+      emptyRegion() {
         return this.input.region === ''
       },
+      farseerError() {
+        return Date.parse(this.input.signed) > Date.today
+      },
+      conceptError() {
+        return Date.parse(this.input.start) < Date.parse(this.input.signed)
+      },
+      invalidRent() {
+        return isNaN(this.input.rent)
+      },
+      invalidLocation() {
+        return this.input.region != ("brussels" || "flanders" || "wallonia")
+      }
     },
   }
 </script>

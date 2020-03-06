@@ -1,0 +1,7 @@
+{
+  "scripts": {
+    "dev": "gnome-terminal --geometry=150x50 --tab --title='Sinatra server' -e 'zsh -c \"ruby api/app.rb;exec zsh\"' --tab --title='vue server' -e 'zsh -c \"cd web/vue-app; npm run serve;exec zsh\"'",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  }
+}
