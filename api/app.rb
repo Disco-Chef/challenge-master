@@ -18,12 +18,10 @@ def endpoint_call(base, month)
     # print url
     url = "https://fi7661d6o4.execute-api.eu-central-1.amazonaws.com/prod/indexes/#{base}/#{month}"
     response = RestClient.get url
-    print intermediary_response = JSON.parse(response)
+    intermediary_response = JSON.parse(response)
     # puts pretty_response = JSON.pretty_generate(intermediary_response)
-    puts "#" * 10
-    print intermediary_response.keys
+    intermediary_response.keys
     base_index = intermediary_response["index"]["MS_HLTH_IDX"]
-    puts "#" * 10
     return base_index
   rescue RestClient::ExceptionWithResponse => e
     p e.response
@@ -46,11 +44,9 @@ end
 # ROUTES ...
 post '/v1/indexations' do
   data = JSON.parse request.body.read
-  print data
   signed_on = Date.parse(data["signed"])
   signed_on = removing_month(signed_on)
   base_month = signed_on.strftime("%Y-%m")
-  puts "Base Month : #{base_month}"
 
   start_on = Date.parse(data["start"])
   start_month = start_on.mon
@@ -70,7 +66,6 @@ post '/v1/indexations' do
     recent_year = Date.today.year - 1
     current_month = Date.new(recent_year, recent_month, recent_day).strftime("%Y-%m")
   end
-  puts "Current Month : #{current_month}"
 
   bases = [1988, 1996, 2004, 2013]
 
@@ -80,7 +75,6 @@ post '/v1/indexations' do
       year_selected = year
     end
   end
-  p "#{year_selected}"
 
   rent = data["rent"]
   region = data["region"]
@@ -101,7 +95,6 @@ post '/v1/indexations' do
   # Computing the rent
 
   new_rent = (params[:rent].to_i * indexes[:current].to_f) / indexes[:base].to_f
-  puts "RENT : #{new_rent} "
   {
     new_rent: new_rent.round(2),
     base_index: indexes[:base],

@@ -161,7 +161,7 @@
         return isNaN(this.input.rent)
       },
       invalidLocation() {
-        return this.input.region != ("brussels" || "flanders" || "wallonia")
+        return !["brussels", "Brussels", "flanders", "Flanders", "wallonia", "Wallonia"].includes(this.input.region)
       }
     },
   }
