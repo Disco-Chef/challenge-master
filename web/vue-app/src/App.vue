@@ -1,7 +1,7 @@
 <template>
   <div id="app">
-    <div id="more-rent" class="results-images" v-if="dataReceived && goodResult"></div>
-    <div id="less-rent" class="results-images" v-if="dataReceived && (goodResult === false)"></div>
+    <div id="more-rent" class="results-gif" v-if="dataReceived && goodResult"></div>
+    <div id="less-rent" class="results-gif" v-if="dataReceived && (goodResult === false)"></div>
     <results-component v-if="dataReceived" v-bind:inputs="inputs" />
     <indexation-form   v-else @add:input="sendInputs" />
   </div>
@@ -97,7 +97,7 @@ export default {
     background: #009435;
     border: 1px solid #009435;
   }
-  .results-images {
+  .results-gif {
     width: 700px;
     height: 400px;
     background-position: center;
