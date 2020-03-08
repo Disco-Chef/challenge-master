@@ -1,24 +1,21 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <!-- <HelloWorld msg="Welcome to Your Vue.js App"/> -->
-
-    <form-inputs-table v-if="dataReceived" v-bind:inputs="inputs" />
+    <div id="more-rent" class="results-images" v-if="dataReceived && goodResult"></div>
+    <div id="less-rent" class="results-images" v-if="dataReceived && (goodResult === false)"></div>
+    <results-component v-if="dataReceived" v-bind:inputs="inputs" />
     <indexation-form   v-else @add:input="sendInputs" />
   </div>
 </template>
 
 <script>
-// import HelloWorld from './components/HelloWorld.vue'
 import IndexationForm from './components/IndexationForm.vue'
-import FormInputsTable from './components/FormInputsTable.vue'
+import ResultsComponent from './components/ResultsComponent.vue'
 
 export default {
   name: 'App',
   components: {
-    // HelloWorld
     IndexationForm,
-    FormInputsTable
+    ResultsComponent
   },
   data() {
     return {
@@ -34,7 +31,8 @@ export default {
           new_rent: 584.18
         },
       ],
-      dataReceived: false
+      dataReceived: false,
+      goodResult: false
     }
   },
   methods: {
@@ -68,6 +66,8 @@ export default {
 
       this.inputs = [newLine]
       this.dataReceived = true
+      this.goodResult = newLine.rent < newLine.new_rent
+
       } catch (error) {
         console.error(error)
       }
@@ -96,5 +96,18 @@ export default {
   button {
     background: #009435;
     border: 1px solid #009435;
+  }
+  .results-images {
+    width: 700px;
+    height: 400px;
+    background-position: center;
+    border-radius: 5px;
+    background-size: cover;
+  }
+  #more-rent {
+    background-image: url(https://media.giphy.com/media/26BGP98lm74FJgfNS/giphy.gif);
+  }
+  #less-rent {
+    background-image: url(https://media.giphy.com/media/71PLYtZUiPRg4/giphy.gif);
   }
 </style>

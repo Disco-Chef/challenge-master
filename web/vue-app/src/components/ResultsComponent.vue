@@ -1,10 +1,10 @@
 <!-- Once api calls and calculations are done, add new indexed rent for user to see past -->
 <template>
-  <div id="form-inputs-table">
+  <div id="results-component">
     <div v-for="input in inputs" :key="input.id" id="results-container">
       <h1>Rent Indexation Result</h1>
       <h4>Your indexed rent amounts to:</h4>
-      <h3>{{ input.new_rent }} Eur</h3>
+      <h2 id="new-rent-value">{{ input.new_rent }} Eur</h2>
       <div class="flexing-between">
         <div class="larger-titles">Base rent </div>
         <div class="values">({{ input.rent }})</div>
@@ -22,7 +22,7 @@
 
 <script>
   export default {
-    name: 'form-inputs-table',
+    name: 'results-component',
     props: {
       inputs: Array,
     },
@@ -50,5 +50,11 @@
   .values {
     font-size: 1.8rem;
     margin: 0px 8px;
+  }
+  #new-rent-value {
+    font-family: cursive;
+  }
+  h1 {
+    font-style: italic;
   }
 </style>

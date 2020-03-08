@@ -6,7 +6,7 @@
           <label>Contract Start Date:</label>
           <input
             ref="first"
-            type="text"
+            type="date"
             v-model="input.start"
             :class="{ 'has-error': (submitting && (emptyStart ||conceptError)) }"
             @focus="clearStatus"
@@ -16,7 +16,7 @@
         <div class="group">
           <label>Contract Signed On:</label>
           <input
-            type="text"
+            type="date"
             v-model="input.signed"
             :class="{ 'has-error': (submitting && (emptySigned || farseerError || conceptError))}"
             @focus="clearStatus"
@@ -57,15 +57,6 @@
         ✅ Indexed rent successfully added
       </p>
       <br>
-      <!-- Big fail radio buttons -->
-      <!-- <label for="region">Brussels</label>
-      <input type="radio" id="brussels" value="brussels" v-model="region">
-      <label for="region">Flanders</label>
-      <input type="radio" id="flanders" value="flanders" v-model="region">
-      <label for="region">Wallonia</label>
-      <input type="radio" id="wallonia" value="wallonia" v-model="region">
-      <br>
-      <span>Region: {{ region }}</span> -->
       <button>Compute indexed rent!</button>
 
     </form>
