@@ -2,8 +2,9 @@ require 'sinatra'
 require "sinatra/cross_origin"
 require 'byebug'
 require 'date'
-require 'rest-client'
+require 'restclient'
 require 'json'
+
 configure do
   enable :cross_origin
 end
