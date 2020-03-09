@@ -3,7 +3,7 @@
     <form @submit.prevent="handleSubmit">
       <div class="groups">
         <div class="group">
-          <label>Contract Start Date:</label>
+          <label class="cursive">Contract Start Date:</label>
           <input
             ref="first"
             type="date"
@@ -14,7 +14,7 @@
           />
         </div>
         <div class="group">
-          <label>Contract Signed On:</label>
+          <label class="cursive">Contract Signed On:</label>
           <input
             type="date"
             v-model="input.signed"
@@ -25,7 +25,7 @@
       </div>
       <div class="groups">
         <div class="group">
-          <label>Rent (Euro):</label>
+          <label class="cursive">Rent (Euro):</label>
           <input
             type="text"
             v-model="input.rent"
@@ -34,7 +34,7 @@
           />
         </div>
         <div class="group">
-          <label>Region (brussels, flanders, wallonia):</label>
+          <label class="cursive">Region (brussels, flanders, wallonia):</label>
           <input
             type="text"
             v-model="input.region"
@@ -57,7 +57,7 @@
         ✅ Indexed rent successfully added
       </p>
       <br>
-      <button>Compute indexed rent!</button>
+      <button class="cursive">Compute indexed rent!</button>
 
     </form>
   </div>
@@ -180,9 +180,12 @@
     justify-content: space-between;
   }
   input {
-    width: 150px;
+    width: 170px;
   }
   label {
-    width: 150px;
+    width: 170px;
+  }
+  .cursive {
+    font-family: cursive;
   }
 </style>
