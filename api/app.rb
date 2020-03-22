@@ -4,6 +4,7 @@ require 'byebug'
 require 'date'
 require 'restclient'
 require 'json'
+require 'open-uri'
 
 configure do
   enable :cross_origin
@@ -14,19 +15,9 @@ before do
 end
 
 def endpoint_call(base, month)
-  begin
-    # url = "https://fi7661d6o4.execute-api.eu-central-1.amazonaws.com/prod/indexes/#{params[:base_year]}/#{params[:current_month]}/"
-    # print url
-    url = "https://fi7661d6o4.execute-api.eu-central-1.amazonaws.com/prod/indexes/#{base}/#{month}"
-    response = RestClient.get url
-    intermediary_response = JSON.parse(response)
-    # puts pretty_response = JSON.pretty_generate(intermediary_response)
-    intermediary_response.keys
-    base_index = intermediary_response["index"]["MS_HLTH_IDX"]
-    return base_index
-  rescue RestClient::ExceptionWithResponse => e
-    p e.response
-  end
+  return JSON.parse(open("https://fi7661d6o4.execute-api.eu-central-1.amazonaws.com/prod/indexes/#{base}/#{month}").read)["index"]["MS_HLTH_IDX"]
+rescue OpenURI::HTTPError => e
+  p e.response
 end
 
 def removing_month(date_object)
@@ -70,12 +61,7 @@ post '/v1/indexations' do
 
   bases = [1988, 1996, 2004, 2013]
 
-  year_selected = nil
-  bases.map do |year|
-    if year <= Date.parse(data["signed"]).year
-      year_selected = year
-    end
-  end
+  year_selected = bases.reverse.find {|base| base <= Date.parse(data["signed"]).year }
 
   rent = data["rent"]
   region = data["region"]

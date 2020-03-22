@@ -46,13 +46,15 @@
 
 
       <br>
-      <p v-if="lackOfInputError && submitting" class="error-message">
+      <template v-if="submitting">
+        <p v-if="lackOfInputError" class="error-message">
         ❗There seems to be some missing fields 😞
-      </p>
-      <p v-if="this.farseerError && submitting" class="error-message">❗One of your your signed date is in the future</p>
-      <p v-if="this.conceptError && submitting" class="error-message">❗Sign date cannot be in the future of the start date 😏 </p>
-      <p v-if="this.invalidRent && submitting" class="error-message">❗Please input a numerical value for the rent 🔎 </p>
-      <p v-if="this.invalidLocation && submitting" class="error-message">❗Region selection can only be one of three: brussels, flanders, wallonia </p>
+        </p>
+        <p v-if="this.farseerError" class="error-message">❗Signed date is in the future from now</p>
+        <p v-if="this.conceptError" class="error-message">❗Sign date cannot be in the future of the start date 😏 </p>
+        <p v-if="this.invalidRent" class="error-message">❗Please input a numerical value for the rent 🔎 </p>
+        <p v-if="this.invalidLocation" class="error-message">❗Region selection can only be one of three: brussels, flanders, wallonia </p>
+      </template>
       <p v-if="success" class="success-message">
         ✅ Indexed rent successfully added
       </p>

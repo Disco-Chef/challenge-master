@@ -1,7 +1,9 @@
 <template>
   <div id="app">
-    <div id="more-rent" class="results-gif" v-if="dataReceived && goodResult"></div>
-    <div id="less-rent" class="results-gif" v-if="dataReceived && (goodResult === false)"></div>
+    <template v-if="dataReceived">
+      <div id="more-rent" class="results-gif" v-if="goodResult"></div>
+      <div id="less-rent" class="results-gif" v-else></div>
+    </template>
     <results-component v-if="dataReceived" v-bind:inputs="inputs" />
     <indexation-form   v-else @add:input="sendInputs" />
   </div>
